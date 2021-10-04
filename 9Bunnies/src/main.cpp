@@ -54,7 +54,6 @@ void everyoneTimeStep(Node*& h) {
         tmp->bunny->timeStep();
         tmp = tmp->next;
     }
-    delete tmp;
 }
 
 void reproduce(Node*& h) {
@@ -63,22 +62,19 @@ void reproduce(Node*& h) {
     while(tmp != NULL) {
         if(tmp->bunny->sex == MALE && tmp->bunny->age > 1 && !tmp->bunny->vampire) {
             adult_male = true;
-            break;
         }
         tmp = tmp->next;
     }
-    delete tmp;
 
     Node* tmp2 = h;
     if(adult_male) {
         while(tmp2 != NULL) {
             if(tmp2->bunny->sex == FEMALE && tmp2->bunny->age > 1 && !tmp2->bunny->vampire) {
-                addAtTheEnd(h);
+                addAtTheEnd(tmp2);
             }
             tmp2 = tmp2->next;
         }
     }
-    delete tmp2;
 }
 
 int removeCorpses(Node*& h) {
@@ -97,6 +93,7 @@ int removeCorpses(Node*& h) {
             return 69; // LA PARTITA SIGNIFICA CHE È FINITA, SONO TUTTI MORTI
         } else {
             h = newNext;
+            newNext = NULL;
             delete newNext;
         }
     }
@@ -108,32 +105,36 @@ int removeCorpses(Node*& h) {
             prev = tmp;
             Node* newNext = tmp->next;
             while(newNext != NULL && !newNext->bunny->alive) {
-                Node* tmp3 = newNext;
+                Node* tmp3 = newNext;  // La variabile tmp3 dovrebbe fare in modo che istanza di coniglio non vivo venga eliminata, penso
                 newNext = newNext->next;
                 delete tmp3;
             }
             prev->next = newNext;
-            delete newNext;
+            newNext = NULL;
         }
         tmp = tmp->next;
     }
-    delete tmp;
+    return 0;
 }
 
 int main() {
     srand(time(NULL));
     Node* head = new Node();
-    for(int i = 0; i < 4; i++) {
+    for(int i = 0; i < 1; i++) {
         addInFront(head);
     }
     for(int i = 0; i < 15; i++) {
 
         std::cout << "\n\n\n----TURN " << i << "----\n" << std::endl;
 
-        if(rand()%3 == 0) addAtTheEnd(head);
 
+        std::cout << "Time stepping..." << std::endl;
         everyoneTimeStep(head);
-        
+        // std::cout << "Reproducing..." << std::endl;
+        reproduce(head);
+        // std::cout << "Remove the corpses..." << std::endl;
+        removeCorpses(head);
+        std::cout << "Printing the list..." << std::endl;
         printList(head);
 
     }

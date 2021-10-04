@@ -10,18 +10,6 @@ enum Sex {
     MALE, FEMALE
 };
 
-class Node
-{
-public:
-    Bunny* bunny;
-    Node* next;
-
-public:
-    Node();
-    Node(Node*& _next);
-
-};
-
 class Bunny
 {
 public: // VARIABLES
@@ -35,5 +23,17 @@ public: // VARIABLES
 public: // METHODS
     Bunny();
     void timeStep();
+
+};
+
+class Node
+{
+public:
+    Bunny* bunny;
+    Node* next;
+
+public:
+    Node();
+    Node(Node*& _next);
 
 };
