@@ -48,6 +48,9 @@ Modify the program so that new babies are born in an empty random adjacent squar
 #include "bunny.h"
 #include "linked.h"
 
+// TODO: function to return linked list's length (use it to pick a random number in the list)
+
+
 void everyoneTimeStep(Node*& h) {
     Node* tmp = h;
     while(tmp != NULL) {
@@ -56,6 +59,7 @@ void everyoneTimeStep(Node*& h) {
     }
 }
 
+// TODO: new bunnies should have the color of the mother
 void reproduce(Node*& h) {
     bool adult_male = false;
     Node* tmp = h;
@@ -79,9 +83,41 @@ void reproduce(Node*& h) {
 
 int removeCorpses(Node*& h) {
     Node* tmp = h;
-    Node* prev = NULL;
 
-    if(!tmp->bunny->alive) { // CONTROLLO SE IL PRIMO CONIGLIO È MORTO, E IN CASO SOSTITUISCO HEAD CON UN ALTRO
+    if(tmp == NULL) return 69;
+
+    if(!tmp->bunny->alive) {
+        Node* newNext = tmp->next;
+        while(newNext != NULL && !newNext->bunny->alive) {
+            newNext = newNext->next;
+        }
+        if(newNext == NULL) {
+            return 0;
+        } else {
+            h = newNext;
+            removeCorpses(h);
+        }
+    } else {
+        while(tmp->next != NULL && tmp->next->bunny->alive) {
+            tmp = tmp->next;
+        }
+        if(tmp->next == NULL) {
+            return 0;
+        } else {
+            Node* newNext = tmp->next;
+            while(newNext != NULL && !newNext->bunny->alive) {
+                newNext = newNext->next;
+            }
+            if(newNext == NULL) {
+                return 0;
+            } else {
+                tmp->next = newNext;
+                removeCorpses(tmp->next);
+            }
+        }
+    }
+    return 0;
+    /*if(!tmp->bunny->alive) { // CONTROLLO SE IL PRIMO CONIGLIO È MORTO, E IN CASO SOSTITUISCO HEAD CON UN ALTRO
         Node* newNext = tmp->next;
         while(newNext != NULL && !newNext->bunny->alive) {
             Node* tmp2 = newNext;  // La variabile tmp2 dovrebbe fare in modo che istanza di coniglio non vivo venga eliminata, penso
@@ -110,13 +146,15 @@ int removeCorpses(Node*& h) {
                 delete tmp3;
             }
             prev->next = newNext;
-            newNext = NULL;
+            tmp = prev->next;
         }
         tmp = tmp->next;
     }
     return 0;
+    */
 }
 
+// TODO: vampire bunnies should kill other bunnies (not vampires) randomly
 int main() {
     srand(time(NULL));
     Node* head = new Node();
@@ -127,14 +165,9 @@ int main() {
 
         std::cout << "\n\n\n----TURN " << i << "----\n" << std::endl;
 
-
-        std::cout << "Time stepping..." << std::endl;
         everyoneTimeStep(head);
-        // std::cout << "Reproducing..." << std::endl;
         reproduce(head);
-        // std::cout << "Remove the corpses..." << std::endl;
         removeCorpses(head);
-        std::cout << "Printing the list..." << std::endl;
         printList(head);
 
     }

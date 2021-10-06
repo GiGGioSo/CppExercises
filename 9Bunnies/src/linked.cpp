@@ -42,7 +42,6 @@ void printList(Node*& h) {
     Node* current = h;
 
     int count = 0;
-    std::cout << "CIAOOO" << current->bunny->alive << std::endl;
 
     while(current != NULL) {
         std::cout << "Bunny " << count << ": name = " << current->bunny->name << ",    color = " << current->bunny->color << ",    age = " << current->bunny->age << ",    alive = " << current->bunny->alive << std::endl;
