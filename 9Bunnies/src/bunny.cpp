@@ -34,8 +34,18 @@ Node::Node() {
     next = NULL;
 }
 
+Node::Node(Color c) {
+    bunny = new Bunny(c);
+    next = NULL;
+}
+
 Node::Node(Node*& _next) {
     bunny = new Bunny();
+    next = _next;
+}
+
+Node::Node(Color c, Node*& _next) {
+    bunny = new Bunny(c);
     next = _next;
 }
 
@@ -53,8 +63,18 @@ Bunny::Bunny() {
     std::cout << "Bunny " << name << " was born!" << std::endl;
 }
 
+Bunny::Bunny(Color c) {
+    sex = (Sex) (rand() % 2);
+    color = c;
+    age = 0;
+    vampire = (rand()%50) == 33; // Estraggo un numero da 0 a 49 (inclusi), se è 33 (cioè 2% di probabilità), sarà 'true'
+    alive = true;
+    name = names_list[rand()%21];
+    std::cout << "Bunny " << name << " was born!" << std::endl;
+}
+
 void Bunny::timeStep() {
-    if((age > 9 && !vampire) || (age > 50 && vampire)) { 
+    if((age > 9 && !vampire && alive) || (age > 50 && vampire && alive)) { 
         alive = false;
         std::cout << "Bunny " << name << " died!" << std::endl;
     }

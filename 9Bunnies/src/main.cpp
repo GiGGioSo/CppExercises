@@ -48,7 +48,7 @@ Modify the program so that new babies are born in an empty random adjacent squar
 #include "bunny.h"
 #include "linked.h"
 
-// TODO: function to return linked list's length (use it to pick a random number in the list)
+#define DEADNESS 6
 
 
 void everyoneTimeStep(Node*& h) {
@@ -59,7 +59,6 @@ void everyoneTimeStep(Node*& h) {
     }
 }
 
-// TODO: new bunnies should have the color of the mother
 void reproduce(Node*& h) {
     bool adult_male = false;
     Node* tmp = h;
@@ -74,7 +73,7 @@ void reproduce(Node*& h) {
     if(adult_male) {
         while(tmp2 != NULL) {
             if(tmp2->bunny->sex == FEMALE && tmp2->bunny->age > 1 && !tmp2->bunny->vampire) {
-                addAtTheEnd(tmp2);
+                addAtTheEnd(tmp2->bunny->color, tmp2);
             }
             tmp2 = tmp2->next;
         }
@@ -84,7 +83,7 @@ void reproduce(Node*& h) {
 int removeCorpses(Node*& h) {
     Node* tmp = h;
 
-    if(tmp == NULL) return 69;
+    if(tmp == NULL) return DEADNESS;
 
     if(!tmp->bunny->alive) {
         Node* newNext = tmp->next;
@@ -92,7 +91,8 @@ int removeCorpses(Node*& h) {
             newNext = newNext->next;
         }
         if(newNext == NULL) {
-            return 0;
+            h = newNext;
+            return DEADNESS;
         } else {
             h = newNext;
             removeCorpses(h);
@@ -109,6 +109,7 @@ int removeCorpses(Node*& h) {
                 newNext = newNext->next;
             }
             if(newNext == NULL) {
+                tmp->next = newNext;
                 return 0;
             } else {
                 tmp->next = newNext;
@@ -167,8 +168,12 @@ int main() {
 
         everyoneTimeStep(head);
         reproduce(head);
-        removeCorpses(head);
+        if(removeCorpses(head) == DEADNESS) {
+            std::cout << "\n\nAll rabbits died, the simulation is over!" << std::endl;
+            return 0;
+        }
         printList(head);
 
     }
+    return 0;
 }

@@ -22,6 +22,7 @@ public: // VARIABLES
 
 public: // METHODS
     Bunny();
+    Bunny(Color c);
     void timeStep();
 
 };
@@ -34,6 +35,8 @@ public:
 
 public:
     Node();
+    Node(Color c);
     Node(Node*& _next);
+    Node(Color c, Node*& _next);
 
 };
