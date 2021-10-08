@@ -60,7 +60,8 @@ Bunny::Bunny() {
     vampire = (rand()%50) == 33; // Estraggo un numero da 0 a 49 (inclusi), se è 33 (cioè 2% di probabilità), sarà 'true'
     alive = true;
     name = names_list[rand()%21];
-    std::cout << "Bunny " << name << " was born!" << std::endl;
+    if(vampire) std::cout << "Radioactive Mutant Vampire bunny " << name << " was born!" << std::endl;
+    else std::cout << "Bunny " << name << " was born!" << std::endl;
 }
 
 Bunny::Bunny(Color c) {
@@ -70,11 +71,12 @@ Bunny::Bunny(Color c) {
     vampire = (rand()%50) == 33; // Estraggo un numero da 0 a 49 (inclusi), se è 33 (cioè 2% di probabilità), sarà 'true'
     alive = true;
     name = names_list[rand()%21];
-    std::cout << "Bunny " << name << " was born!" << std::endl;
+    if(vampire) std::cout << "Radioactive Mutant Vampire bunny " << name << " was born!" << std::endl;
+    else std::cout << "Bunny " << name << " was born!" << std::endl;
 }
 
 void Bunny::timeStep() {
-    if((age > 9 && !vampire && alive) || (age > 50 && vampire && alive)) { 
+    if((age > 9 && !vampire && alive) || (age > 49 && vampire && alive)) { 
         alive = false;
         std::cout << "Bunny " << name << " died!" << std::endl;
     }

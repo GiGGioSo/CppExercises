@@ -82,6 +82,7 @@ int getLength(Node*& h) {
     int count = 0;
     while(current != NULL) {
         count++;
+        current = current->next;
     }
     return count;
 }
@@ -93,7 +94,7 @@ void printList(Node*& h) {
     int count = 0;
 
     while(current != NULL) {
-        std::cout << "Bunny " << count << ": name = " << current->bunny->name << ",    color = " << current->bunny->color << ",    age = " << current->bunny->age << ",    alive = " << current->bunny->alive << std::endl;
+        std::cout << "Bunny " << count << ": name = " << current->bunny->name << ",    color = " << current->bunny->color << ",    age = " << current->bunny->age << ",    alive = " << current->bunny->alive << ",    vampire = " << current->bunny->vampire << std::endl;
         current = current->next;
         count++;
     }
