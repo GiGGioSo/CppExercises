@@ -50,7 +50,8 @@ Modify the program so that new babies are born in an empty random adjacent squar
 
 #define DEADNESS 69
 
-// TODO: kill half of the bunnies if they are 1000 or more
+const int MAXIMUM_BUNNIES = 1000;
+
 
 void everyoneTimeStep(Node*& h) {
     Node* tmp = h;
@@ -60,6 +61,7 @@ void everyoneTimeStep(Node*& h) {
     }
 }
 
+// DONE: sort bunnies by age (just add them at the front LOL)
 void reproduce(Node*& h) {
     bool adult_male = false;
     Node* tmp = h;
@@ -74,14 +76,13 @@ void reproduce(Node*& h) {
     if(adult_male) {
         while(tmp2 != NULL) { // for every female bunny, a new bunny gets added at the end, with her same color
             if(tmp2->bunny->sex == FEMALE && tmp2->bunny->age > 2 && !tmp2->bunny->vampire) {
-                addAtTheEnd(tmp2->bunny->color, tmp2);
+                addInFront(tmp2->bunny->color, h);
             }
             tmp2 = tmp2->next;
         }
     }
 }
 
-// DONE: vampire bunnies should kill other bunnies (not vampires) randomly
 void transformBunnies(Node*& h) {
     Node* current = h;
     int normals = 0;
@@ -96,9 +97,9 @@ void transformBunnies(Node*& h) {
     if(normals == 0) return;
     if(vampires == 0) return;
     bunnies_to_transform = (vampires > normals) ? normals : vampires; // If there are more vampires than normal bunnies, I reduce the number of bunnies to transform to the one of the normals ones
-    int unlucky_index[bunnies_to_transform]; // array of the indexes of the bunnies that will have to be transformed
+    int unlucky_indexes[bunnies_to_transform]; // array of the indexes of the bunnies that will have to be transformed
     for(int i = 0; i < bunnies_to_transform; i++) { // initalize the whole array to -1 (not assigned), because 0 is a valid value for this use case
-        unlucky_index[i] = -1;
+        unlucky_indexes[i] = -1;
     }
     // std::cout << "Starting to assign unlucky indexes\n" << std::endl;
     for(int i = 0; i < bunnies_to_transform; i++) { // all the bunnies get picked
@@ -109,15 +110,14 @@ void transformBunnies(Node*& h) {
             unlucky = rand() % normals; // pick a random index from the possible normals bunnies that will have to die
             // std::cout << "The possible number is " << unlucky << std::endl;
             for(int j = 0; j < bunnies_to_transform; j++) {
-                if(unlucky_index[j] == -1) continue;
-                if(unlucky_index[j] == unlucky) {
+                if(unlucky_indexes[j] == unlucky) {
                     // std::cout << "Unlucky number " << unlucky << " found in position " << j << std::endl;
                     isOk = false;
                     break;
                 }
             }
         } while (!isOk);
-        unlucky_index[i] = unlucky;
+        unlucky_indexes[i] = unlucky;
     }
     // std::cout << "Starting to trasform the unlucky bunnies" << std::endl;
 
@@ -128,7 +128,7 @@ void transformBunnies(Node*& h) {
     while(current != NULL) {
         if(!current->bunny->vampire) { // everything happens only if the bunny is NOT vampire obv
             for(int i = 0; i < bunnies_to_transform; i++) {
-                if(unlucky_index[i] == current_index) {
+                if(unlucky_indexes[i] == current_index) {
                     std::cout << "Bunny " << current->bunny->name << " was transformed in a vampire!" << std::endl;
                     current->bunny->vampire = true; // here it transforms
                     break;
@@ -216,17 +216,57 @@ int removeCorpses(Node*& h) {
     */
 }
 
+// DONE: kill half of the bunnies if they are 1000 or more
+void killHalfBunnies(Node*& h, int& length) {
+    int unlucky_bunnies[length / 2];
+    for(int i = 0; i < length/2; i++) {
+        unlucky_bunnies[i] = -1;
+    }
+    for(int i = 0; i < length/2; i++) {
+        bool isOk = true;
+        int unlucky_index = 0;
+        do {
+            isOk = true; // I assume the random number will be OK, then I check if it's not
+            unlucky_index = rand() % length; // random number among the possible ones (length)
+            //std::cout << "Random number is " << unlucky_index << std::endl;
+            for(int j = 0; j < length/2; j++) {
+                if(unlucky_bunnies[j] == unlucky_index) {
+                    isOk = false;
+                    break;
+                }
+            }
+        } while(!isOk);
+        unlucky_bunnies[i] = unlucky_index;
+    }
+
+    Node* current = h;
+    int current_index = 0;
+    while(current != NULL) {
+        for(int i = 0; i < length/2; i++) {
+            if(unlucky_bunnies[i] == current_index) {
+                current->bunny->alive = false;  
+                break;
+            }
+        }
+        current_index++;
+        current = current->next;
+    }
+}
+
 int main() {
     bool gameOver = false;
     int most_bunnies = 0;
+    int length = 0;
     srand(time(NULL));
     Node* head = new Node();
     for(int i = 0; i < 4; i++) {
         addInFront(head);
     }
+    std::cout << "\n\n----INITIAL SITUATION----\n" << std::endl;
+    printList(head);
     for(int i = 0; i < 300; i++) {
 
-        std::cout << "\n\n\n----TURN " << i << "----\n" << std::endl;
+        std::cout << "\n\n\n----TURN " << i+1 << "----\n" << std::endl;
         // std::cout << "Time stepping..." << std::endl;
         everyoneTimeStep(head);
         // std::cout << "Reproducing..." << std::endl;
@@ -234,11 +274,13 @@ int main() {
         // std::cout << "Transforming bunnies..." << std::endl;
         transformBunnies(head);
         // std::cout << "Removing corpses..." << std::endl;
+        length = getLength(head);
+        if(length > MAXIMUM_BUNNIES) killHalfBunnies(head, length);
+        if(length > most_bunnies) most_bunnies = length;
         if(removeCorpses(head) == DEADNESS) gameOver = true;
+        length = getLength(head);
         // std::cout << "Printing the list..." << std::endl;
         printList(head);
-        int length = getLength(head);
-        if(length > most_bunnies) most_bunnies = length;
         if(gameOver) {
             std::cout << "\n\nAll bunnies died, the simulation is over! The maximum number of bunnies has been " << most_bunnies << "!!" << std::endl;
             return 0;

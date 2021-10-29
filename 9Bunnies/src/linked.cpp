@@ -88,7 +88,6 @@ int getLength(Node*& h) {
 }
 
 
-// TODO: print bunnies by age  [sort them in general or just when you print them??]
 void printList(Node*& h) {
     Node* current = h;
     int count = 0;

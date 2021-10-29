@@ -57,7 +57,7 @@ Bunny::Bunny() {
     sex = (Sex) (rand() % 2);
     color = (Color) (rand() % 4);
     age = 0;
-    vampire = (rand()%50) == 33; // Estraggo un numero da 0 a 49 (inclusi), se è 33 (cioè 2% di probabilità), sarà 'true'
+    vampire = (rand()%100) == 33; // Estraggo un numero da 0 a 49 (inclusi), se è 33 (cioè 2% di probabilità), sarà 'true'
     alive = true;
     name = names_list[rand()%21];
     if(vampire) std::cout << "Radioactive Mutant Vampire bunny " << name << " was born!" << std::endl;
@@ -68,7 +68,7 @@ Bunny::Bunny(Color c) {
     sex = (Sex) (rand() % 2);
     color = c;
     age = 0;
-    vampire = (rand()%50) == 33; // Estraggo un numero da 0 a 49 (inclusi), se è 33 (cioè 2% di probabilità), sarà 'true'
+    vampire = (rand()%100) == 33; // Estraggo un numero da 0 a 49 (inclusi), se è 33 (cioè 2% di probabilità), sarà 'true'
     alive = true;
     name = names_list[rand()%21];
     if(vampire) std::cout << "Radioactive Mutant Vampire bunny " << name << " was born!" << std::endl;
