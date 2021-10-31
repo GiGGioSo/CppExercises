@@ -43,6 +43,7 @@ Modify the program so that new babies are born in an empty random adjacent squar
 */
 
 #include <iostream>
+#include <vector>
 #include <time.h>
 #include <random>
 #include "bunny.h"
@@ -52,17 +53,19 @@ Modify the program so that new babies are born in an empty random adjacent squar
 
 const int MAXIMUM_BUNNIES = 1000;
 
+// DONE: Regroup all event messages to an array of strings
 
-void everyoneTimeStep(Node*& h) {
+// TODO: Print all event massages spread among 2 seconds
+
+void everyoneTimeStep(Node*& h, std::vector<std::string>& messages) {
     Node* tmp = h;
     while(tmp != NULL) {
-        tmp->bunny->timeStep();
+        tmp->bunny->timeStep(messages);
         tmp = tmp->next;
     }
 }
 
-// DONE: sort bunnies by age (just add them at the front LOL)
-void reproduce(Node*& h) {
+void reproduce(Node*& h, std::vector<std::string>& messages) {
     bool adult_male = false;
     Node* tmp = h;
     while(tmp != NULL) { // just check if there is a male bunny older than 2
@@ -76,14 +79,14 @@ void reproduce(Node*& h) {
     if(adult_male) {
         while(tmp2 != NULL) { // for every female bunny, a new bunny gets added at the end, with her same color
             if(tmp2->bunny->sex == FEMALE && tmp2->bunny->age > 2 && !tmp2->bunny->vampire) {
-                addInFront(tmp2->bunny->color, h);
+                addInFront(tmp2->bunny->color, h, messages);
             }
             tmp2 = tmp2->next;
         }
     }
 }
 
-void transformBunnies(Node*& h) {
+void transformBunnies(Node*& h, std::vector<std::string>& messages) {
     Node* current = h;
     int normals = 0;
     int vampires = 0;
@@ -129,7 +132,7 @@ void transformBunnies(Node*& h) {
         if(!current->bunny->vampire) { // everything happens only if the bunny is NOT vampire obv
             for(int i = 0; i < bunnies_to_transform; i++) {
                 if(unlucky_indexes[i] == current_index) {
-                    std::cout << "Bunny " << current->bunny->name << " was transformed in a vampire!" << std::endl;
+                    messages.push_back("Bunny " + current->bunny->name + " was transformed in a vampire!");
                     current->bunny->vampire = true; // here it transforms
                     break;
                 }
@@ -216,7 +219,6 @@ int removeCorpses(Node*& h) {
     */
 }
 
-// DONE: kill half of the bunnies if they are 1000 or more
 void killHalfBunnies(Node*& h, int& length) {
     int unlucky_bunnies[length / 2];
     for(int i = 0; i < length/2; i++) {
@@ -253,14 +255,23 @@ void killHalfBunnies(Node*& h, int& length) {
     }
 }
 
+void printEventsAndList(Node*& h, std::vector<std::string>& messages) {
+    for(const std::string& message : messages) {
+        std::cout << message << std::endl;
+    }
+    printList(h);
+}
+
 int main() {
+    srand(time(NULL));
+    std::vector<std::string> messages = {};
     bool gameOver = false;
     int most_bunnies = 0;
     int length = 0;
-    srand(time(NULL));
-    Node* head = new Node();
-    for(int i = 0; i < 4; i++) {
-        addInFront(head);
+    Node* head = new Node(messages);
+
+    for(int i = 0; i < 5; i++) {
+        addInFront(head, messages);
     }
     std::cout << "\n\n----INITIAL SITUATION----\n" << std::endl;
     printList(head);
@@ -268,11 +279,11 @@ int main() {
 
         std::cout << "\n\n\n----TURN " << i+1 << "----\n" << std::endl;
         // std::cout << "Time stepping..." << std::endl;
-        everyoneTimeStep(head);
+        everyoneTimeStep(head, messages);
         // std::cout << "Reproducing..." << std::endl;
-        reproduce(head);
+        reproduce(head, messages);
         // std::cout << "Transforming bunnies..." << std::endl;
-        transformBunnies(head);
+        transformBunnies(head, messages);
         // std::cout << "Removing corpses..." << std::endl;
         length = getLength(head);
         if(length > MAXIMUM_BUNNIES) killHalfBunnies(head, length);
@@ -280,7 +291,7 @@ int main() {
         if(removeCorpses(head) == DEADNESS) gameOver = true;
         length = getLength(head);
         // std::cout << "Printing the list..." << std::endl;
-        printList(head);
+        printEventsAndList(head, messages);
         if(gameOver) {
             std::cout << "\n\nAll bunnies died, the simulation is over! The maximum number of bunnies has been " << most_bunnies << "!!" << std::endl;
             return 0;

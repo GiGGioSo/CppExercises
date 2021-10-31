@@ -2,23 +2,23 @@
 #include "bunny.h"
 #include <iostream>
 
-int addInFront(Node*& h) {
-    Node* newNode = new Node();
+int addInFront(Node*& h, std::vector<std::string>& messages) {
+    Node* newNode = new Node(messages);
     newNode->next = h;
     h = newNode;
     return 0;
 }
 
-int addInFront(Color c, Node*& h) {
-    Node* newNode = new Node(c);
+int addInFront(Color c, Node*& h, std::vector<std::string>& messages) {
+    Node* newNode = new Node(c, messages);
     newNode->next = h;
     h = newNode;
     return 0;
 }
 
 
-int addInMiddle(Node*& h, int pos) {
-    Node* newNode = new Node();
+int addInMiddle(Node*& h, int pos, std::vector<std::string>& messages) {
+    Node* newNode = new Node(messages);
 
     Node* current = h;
     for(int i = 0; i < pos; i++) {
@@ -35,8 +35,8 @@ int addInMiddle(Node*& h, int pos) {
     return 0;
 }
 
-int addInMiddle(Color c, Node*& h, int pos) {
-    Node* newNode = new Node(c);
+int addInMiddle(Color c, Node*& h, int pos, std::vector<std::string>& messages) {
+    Node* newNode = new Node(c, messages);
 
     Node* current = h;
     for(int i = 0; i < pos; i++) {
@@ -54,8 +54,8 @@ int addInMiddle(Color c, Node*& h, int pos) {
 }
 
 
-int addAtTheEnd(Node*& h) {
-    Node* newNode = new Node();
+int addAtTheEnd(Node*& h, std::vector<std::string>& messages) {
+    Node* newNode = new Node(messages);
 
     Node* current = h;
     while(current->next != NULL) {
@@ -65,8 +65,8 @@ int addAtTheEnd(Node*& h) {
     return 0;
 }
 
-int addAtTheEnd(Color c, Node*& h) {
-    Node* newNode = new Node(c);
+int addAtTheEnd(Color c, Node*& h, std::vector<std::string>& messages) {
+    Node* newNode = new Node(c, messages);
 
     Node* current = h;
     while(current->next != NULL) {

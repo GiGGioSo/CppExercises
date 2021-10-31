@@ -3,14 +3,14 @@
 #include <iostream>
 #include "bunny.h"
 
-int addInFront(Node*& h);
-int addInFront(Color c, Node*& h);
+int addInFront(Node*& h, std::vector<std::string>& messages);
+int addInFront(Color c, Node*& h, std::vector<std::string>& messages);
 
-int addInMiddle(Node*& h, int pos);
-int addInMiddle(Color c, Node*& h, int pos);
+int addInMiddle(Node*& h, int pos, std::vector<std::string>& messages);
+int addInMiddle(Color c, Node*& h, int pos, std::vector<std::string>& messages);
 
-int addAtTheEnd(Node*& h);
-int addAtTheEnd(Color c, Node*& h);
+int addAtTheEnd(Node*& h, std::vector<std::string>& messages);
+int addAtTheEnd(Color c, Node*& h, std::vector<std::string>& messages);
 
 int getLength(Node*& h);
 

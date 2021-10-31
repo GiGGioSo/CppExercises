@@ -1,6 +1,7 @@
 #pragma once
 #include "bunny.h"
 #include <iostream>
+#include <vector>
 
 enum Color {
     WHITE, BROWN, BLACK, SPOTTED
@@ -21,9 +22,9 @@ public: // VARIABLES
     bool alive;
 
 public: // METHODS
-    Bunny();
-    Bunny(Color c);
-    void timeStep();
+    Bunny(std::vector<std::string>& messages);
+    Bunny(Color c, std::vector<std::string>& messages);
+    void timeStep(std::vector<std::string>& messages);
 
 };
 
@@ -34,9 +35,9 @@ public:
     Node* next;
 
 public:
-    Node();
-    Node(Color c);
-    Node(Node*& _next);
-    Node(Color c, Node*& _next);
+    Node(std::vector<std::string>& messages);
+    Node(Color c, std::vector<std::string>& messages);
+    Node(Node*& _next, std::vector<std::string>& messages);
+    Node(Color c, Node*& _next, std::vector<std::string>& messages);
 
 };
