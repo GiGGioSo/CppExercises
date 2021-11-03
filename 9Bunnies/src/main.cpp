@@ -46,6 +46,8 @@ Modify the program so that new babies are born in an empty random adjacent squar
 #include <vector>
 #include <time.h>
 #include <random>
+#include <chrono>
+#include <thread>
 #include "bunny.h"
 #include "linked.h"
 
@@ -53,9 +55,29 @@ Modify the program so that new babies are born in an empty random adjacent squar
 
 const int MAXIMUM_BUNNIES = 1000;
 
-// DONE: Regroup all event messages to an array of strings
+const int TIME_TO_DISPLAY_EVENTS_MS = 2000;
+const int DEFAULT_TIME_BETWEEN_EVENTS_MS = 2000;
 
-// TODO: Print all event massages spread among 2 seconds
+const int TIME_TO_PRINT_BUNNIES_MS = 1000;
+
+const int DEFAULT_SLOW_PRINT_TOTAL_TIME = 1500;
+
+
+// DONE: Print all event massages spread among 2 seconds
+
+
+void slow_print(std::string& message, int total_time_ms = DEFAULT_SLOW_PRINT_TOTAL_TIME) {
+    unsigned int actual_size = 0;
+    for(size_t i = 0; i < message.size(); i++) {
+        if(message[i] != '\n') actual_size++;
+    }
+    int time_between_words_ms = total_time_ms / actual_size;
+    for(size_t i = 0; i < message.size(); i++) {
+        std::cout << message[i];
+        std::cout.flush();
+        if(message[i] != '\n') std::this_thread::sleep_for(std::chrono::milliseconds(time_between_words_ms));
+    }
+}
 
 void everyoneTimeStep(Node*& h, std::vector<std::string>& messages) {
     Node* tmp = h;
@@ -255,11 +277,29 @@ void killHalfBunnies(Node*& h, int& length) {
     }
 }
 
-void printEventsAndList(Node*& h, std::vector<std::string>& messages) {
+void printEventsAndList(Node*& h, std::vector<std::string>& messages, int length, int turn = -1) {
+    // Printing turn title
+    std::string turn_message;
+    if(turn >= 0) turn_message = "\n\n\n----TURN " + std::to_string(turn+1) + "----\n";
+    else turn_message = "----INITIAL SITUATION----\n";
+    slow_print(turn_message);
+    // Printing events
+    int time_between_events_ms = (messages.size() > 0) ? TIME_TO_DISPLAY_EVENTS_MS / messages.size() : DEFAULT_TIME_BETWEEN_EVENTS_MS;
     for(const std::string& message : messages) {
         std::cout << message << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(time_between_events_ms));
     }
-    printList(h);
+    messages.clear();
+    // Printing list of bunnies
+    int time_between_bunnies_ms = (length > 0) ? TIME_TO_PRINT_BUNNIES_MS / length : 0;
+    Node* current = h;
+    int count = 0;
+    while(current != NULL) {
+        std::cout << "Bunny " << count << ": name = " << current->bunny->name << ",    color = " << current->bunny->color << ",    age = " << current->bunny->age << ",    alive = " << current->bunny->alive << ",    vampire = " << current->bunny->vampire << std::endl;
+        current = current->next;
+        count++;
+        std::this_thread::sleep_for(std::chrono::milliseconds(time_between_bunnies_ms));
+    }
 }
 
 int main() {
@@ -273,11 +313,10 @@ int main() {
     for(int i = 0; i < 5; i++) {
         addInFront(head, messages);
     }
-    std::cout << "\n\n----INITIAL SITUATION----\n" << std::endl;
-    printList(head);
+    length = getLength(head);
+    printEventsAndList(head, messages, length);
     for(int i = 0; i < 300; i++) {
 
-        std::cout << "\n\n\n----TURN " << i+1 << "----\n" << std::endl;
         // std::cout << "Time stepping..." << std::endl;
         everyoneTimeStep(head, messages);
         // std::cout << "Reproducing..." << std::endl;
@@ -291,7 +330,7 @@ int main() {
         if(removeCorpses(head) == DEADNESS) gameOver = true;
         length = getLength(head);
         // std::cout << "Printing the list..." << std::endl;
-        printEventsAndList(head, messages);
+        printEventsAndList(head, messages, length, i+1);
         if(gameOver) {
             std::cout << "\n\nAll bunnies died, the simulation is over! The maximum number of bunnies has been " << most_bunnies << "!!" << std::endl;
             return 0;
