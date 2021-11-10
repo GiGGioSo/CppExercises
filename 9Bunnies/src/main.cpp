@@ -56,14 +56,14 @@ Modify the program so that new babies are born in an empty random adjacent squar
 const int MAXIMUM_BUNNIES = 1000;
 
 const int TIME_TO_DISPLAY_EVENTS_MS = 2000;
-const int DEFAULT_TIME_BETWEEN_EVENTS_MS = 2000;
+const int DEFAULT_TIME_WHEN_NO_EVENTS_MS = 1000;
 
-const int TIME_TO_PRINT_BUNNIES_MS = 1000;
+const int TIME_TO_PRINT_BUNNIES_MS = 2000;
 
 const int DEFAULT_SLOW_PRINT_TOTAL_TIME = 1500;
 
 
-// DONE: Print all event massages spread among 2 seconds
+// DONE: Print the list in a prettier way
 
 
 void slow_print(std::string& message, int total_time_ms = DEFAULT_SLOW_PRINT_TOTAL_TIME) {
@@ -284,18 +284,43 @@ void printEventsAndList(Node*& h, std::vector<std::string>& messages, int length
     else turn_message = "----INITIAL SITUATION----\n";
     slow_print(turn_message);
     // Printing events
-    int time_between_events_ms = (messages.size() > 0) ? TIME_TO_DISPLAY_EVENTS_MS / messages.size() : DEFAULT_TIME_BETWEEN_EVENTS_MS;
+    int time_between_events_ms = 0;
+    if(messages.size() > 0) {
+        time_between_events_ms = TIME_TO_DISPLAY_EVENTS_MS / messages.size();
+    } else { // If there are no messages I want to annouce it
+        messages.push_back("Nothing happened this turn...");
+        time_between_events_ms = DEFAULT_TIME_WHEN_NO_EVENTS_MS;
+    }
     for(const std::string& message : messages) {
         std::cout << message << std::endl;
         std::this_thread::sleep_for(std::chrono::milliseconds(time_between_events_ms));
     }
     messages.clear();
     // Printing list of bunnies
-    int time_between_bunnies_ms = (length > 0) ? TIME_TO_PRINT_BUNNIES_MS / length : 0;
     Node* current = h;
-    int count = 0;
+    if(current == NULL) return;
+    std::string tmp_message = "\n_Bunny List_\n";
+    slow_print(tmp_message, DEFAULT_SLOW_PRINT_TOTAL_TIME/2);
+    int time_between_bunnies_ms = (length > 0) ? TIME_TO_PRINT_BUNNIES_MS / length : 0;
+    int count = 1;
     while(current != NULL) {
-        std::cout << "Bunny " << count << ": name = " << current->bunny->name << ",    color = " << current->bunny->color << ",    age = " << current->bunny->age << ",    alive = " << current->bunny->alive << ",    vampire = " << current->bunny->vampire << std::endl;
+        // Getting all the info of the bunny in a pretty way
+        // ID
+        std::string tmp = "  Bunny ID: ";
+        tmp += (count > 999) ? std::to_string(count) : ((count > 99) ? std::to_string(count) + " " : (count > 9) ? std::to_string(count) + "  " : std::to_string(count) + "   ");
+        // NAME
+        tmp += "   Name: " + current->bunny->name + std::string(9 - current->bunny->name.size(), ' ');
+        // AGE
+        tmp += "   Age: " + std::to_string(current->bunny->age);
+        if(current->bunny->age < 10) tmp += " ";
+        // COLOR
+        Color col = current->bunny->color; // I don't want to have to write 'current->bunny->color' every time in the next if statements
+        tmp += "   Color: ";
+        tmp += (col == WHITE) ? "WHITE   " : ((col == BROWN) ? "BROWN   " : ((col == BLACK) ? "BLACK   " : "SPOTTED "));
+        // VAMPIRE
+        tmp += "   Vampire: ";
+        tmp += (current->bunny->vampire) ? "YES" : "NO";
+        std::cout << tmp << std::endl;
         current = current->next;
         count++;
         std::this_thread::sleep_for(std::chrono::milliseconds(time_between_bunnies_ms));
